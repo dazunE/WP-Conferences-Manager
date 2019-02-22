@@ -11,8 +11,8 @@ const SESSION_POST_TYPE = 'cp_sessions';
 add_action( 'init', __NAMESPACE__ . '\\register_sessions_post_type' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\sessions_post_meta_fields' );
 add_action( 'admin_menu' ,__NAMESPACE__. '\\add_session_sub_menu');
-//add_action( 'manage_cp_sessions_posts_custom_column' , __NAMESPACE__.'\\sepaker_thumbnail_column' , 2 , 10 );
-//add_filter( 'manage_cp_sessions_posts_columns' ,__NAMESPACE__.'\\add_session_thumbnail_to_column' , 1 , 10 );
+add_action( 'manage_'.SESSION_POST_TYPE.'_posts_custom_column' , __NAMESPACE__.'\\session_additional_columns_data' , 2 , 10 );
+add_filter( 'manage_'.SESSION_POST_TYPE.'_posts_columns' ,__NAMESPACE__.'\\session_additional_columns' , 1 , 10 );
 
 function register_sessions_post_type() {
 
@@ -78,11 +78,6 @@ function register_sessions_post_type() {
 
 }
 
-function add_session_thumbnail_to_column( $columns ) {
-	return array_merge( $columns,
-		array( 'thumbnail' => __( 'session Avatar', CEYLON_CONF_TEXT_DOMAIN ) ) );
-}
-
 function sessions_post_meta_fields() {
 
 	Container::make( 'post_meta', __( 'Speaker Information', CEYLON_CONF_TEXT_DOMAIN ) )
@@ -108,7 +103,7 @@ function sessions_post_meta_fields() {
 		         Field::make( 'date', 'ccm_session_date', __( 'Event Start Date', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_attribute( 'placeholder', __( 'Date of event start', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_storage_format( 'Y-m-d' ),
-		         Field::make( 'time', 'ccm_', __( 'Starting time', CEYLON_CONF_TEXT_DOMAIN ) )
+		         Field::make( 'time', 'ccm_start_time', __( 'Starting time', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_attribute( 'placeholder', 'Session Start Time', CEYLON_CONF_TEXT_DOMAIN ),
 		         Field::make( 'select', 'ccm_session_type', __( 'Session Type', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_options( array(
@@ -131,4 +126,22 @@ function add_session_sub_menu(){
 		'manage_options',
 		'edit.php?post_type='.SESSION_POST_TYPE
 	);
+}
+
+function session_additional_columns( $columns ){
+	return array_merge( $columns ,
+		array(
+			'time' => __('Time' , CEYLON_CONF_TEXT_DOMAIN ),
+			'speaker' => __('Speaker' , CEYLON_CONF_TEXT_DOMAIN )
+		));
+}
+
+function session_additional_columns_data( $column , $post_id ) {
+	if( $column === 'time'){
+      echo carbon_get_post_meta($post_id,'ccm_start_time');
+	}
+	if( $column === 'speaker'){
+		$speaker = carbon_get_post_meta( $post_id ,'ccm_session_speaker');
+		print_r( $speaker );
+	}
 }

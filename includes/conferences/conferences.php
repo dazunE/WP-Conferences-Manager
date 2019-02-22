@@ -92,7 +92,7 @@ function sepaker_thumbnail_column( $column , $post_id  ){
 function conferences_post_meta_fields() {
 
 	Container::make( 'post_meta', __( 'Speaker Information', CEYLON_CONF_TEXT_DOMAIN ) )
-	         ->where( 'post_type', '=', SPEAKER_POST_TYPE )
+	         ->where( 'post_type', '=', CONFERENCE_POST_TYPE )
 	         ->set_context( 'side' )
 	         ->add_fields( array(
 		         Field::make( 'complex', 'ccm_social_links', __( 'Social Links', CEYLON_CONF_TEXT_DOMAIN ) )
