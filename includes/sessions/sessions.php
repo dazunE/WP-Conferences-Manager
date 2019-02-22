@@ -10,6 +10,7 @@ const SESSION_POST_TYPE = 'cp_sessions';
 
 add_action( 'init', __NAMESPACE__ . '\\register_sessions_post_type' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\sessions_post_meta_fields' );
+add_action( 'admin_menu' ,__NAMESPACE__. '\\add_session_sub_menu');
 //add_action( 'manage_cp_sessions_posts_custom_column' , __NAMESPACE__.'\\sepaker_thumbnail_column' , 2 , 10 );
 //add_filter( 'manage_cp_sessions_posts_columns' ,__NAMESPACE__.'\\add_session_thumbnail_to_column' , 1 , 10 );
 
@@ -59,7 +60,7 @@ function register_sessions_post_type() {
 		'hierarchical'        => false,
 		'public'              => true,
 		'show_ui'             => true,
-		'show_in_menu'        => true,
+		'show_in_menu'        => false,
 		'menu_position'       => 5,
 		'menu_icon'           => 'dashicons-list-view',
 		'show_in_admin_bar'   => true,
@@ -77,37 +78,57 @@ function register_sessions_post_type() {
 
 }
 
-function add_session_thumbnail_to_column( $columns ){
-	return array_merge( $columns ,
-		array( 'thumbnail' => __('session Avatar' , CEYLON_CONF_TEXT_DOMAIN ) ) );
-}
-
-function sepaker_thumbnail_column( $column , $post_id  ){
-	if( $column === 'thumbnail'){
-		echo the_post_thumbnail( array(72,72) );
-	}
+function add_session_thumbnail_to_column( $columns ) {
+	return array_merge( $columns,
+		array( 'thumbnail' => __( 'session Avatar', CEYLON_CONF_TEXT_DOMAIN ) ) );
 }
 
 function sessions_post_meta_fields() {
 
-	Container::make( 'post_meta', __( 'session Information', CEYLON_CONF_TEXT_DOMAIN ) )
+	Container::make( 'post_meta', __( 'Speaker Information', CEYLON_CONF_TEXT_DOMAIN ) )
 	         ->where( 'post_type', '=', SESSION_POST_TYPE )
 	         ->set_context( 'side' )
 	         ->add_fields( array(
-		         Field::make( 'complex', 'ccm_social_links', __( 'Social Links', CEYLON_CONF_TEXT_DOMAIN ) )
-		              ->add_fields( 'crb_links', array(
-			              Field::make( 'select', 'ccm_social_network_type', __( 'Select a network' ) )
-			                   ->set_options( array(
-				                   'facebook' => 'Facebook',
-				                   'twitter' => 'Twitter',
-				                   'whatsapp' => 'WhatsApp',
-				                   'linkdin' => 'LinkdIn',
-				                   'youtube' => 'YouTube',
-			                   ) )
-			                   ->set_default_value('facebook'),
-			              Field::make( 'text', 'ccm_social_network_link', __( 'Social Profile Link' ) ),
+		         Field::make( 'association', 'ccm_session_speaker', __( 'Session Speaker', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_types( array(
+			              array(
+				              'type'      => 'post',
+				              'post_type' => 'cp_speakers',
+			              )
 		              ) )
+		              ->set_duplicates_allowed( false )
+		              ->set_max( 1 )
 
 	         ) );
 
+	Container::make( 'post_meta', __( 'Session Information', CEYLON_CONF_TEXT_DOMAIN ) )
+	         ->where( 'post_type', '=', SESSION_POST_TYPE )
+	         ->set_context( 'side' )
+	         ->add_fields( array(
+		         Field::make( 'date', 'ccm_session_date', __( 'Event Start Date', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_attribute( 'placeholder', __( 'Date of event start', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_storage_format( 'Y-m-d' ),
+		         Field::make( 'time', 'ccm_', __( 'Starting time', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_attribute( 'placeholder', 'Session Start Time', CEYLON_CONF_TEXT_DOMAIN ),
+		         Field::make( 'select', 'ccm_session_type', __( 'Session Type', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_options( array(
+			              'regular' => __( 'Regular Session', CEYLON_CONF_TEXT_DOMAIN ),
+			              'break'   => __( 'Session Break', CEYLON_CONF_TEXT_DOMAIN ),
+		              ) ),
+		         Field::make( 'text', 'ccm_session_slides', __( 'Session Slides', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_attribute( 'type', 'url' ),
+		         Field::make( 'text', 'ccm_session_video', __( 'Session Video', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_attribute( 'type', 'url' )
+	         ) );
+
+}
+
+function add_session_sub_menu(){
+	add_submenu_page(
+		'edit.php?post_type=cp_conferences',
+		__('Sessions',CEYLON_CONF_TEXT_DOMAIN),
+		__('Sessions',CEYLON_CONF_TEXT_DOMAIN),
+		'manage_options',
+		'edit.php?post_type='.SESSION_POST_TYPE
+	);
 }

@@ -22,3 +22,5 @@ require_once CEYLON_CONF_PLUGIN_PATH . '/includes/bootstrap.php';
 require_once CEYLON_CONF_PLUGIN_PATH . '/includes/speakers/speakers.php';
 
 require_once CEYLON_CONF_PLUGIN_PATH . '/includes/sessions/sessions.php';
+
+require_once CEYLON_CONF_PLUGIN_PATH . '/includes/conferences/conferences.php';
