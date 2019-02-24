@@ -9,10 +9,12 @@ use Carbon_Fields\Field;
 const SESSION_POST_TYPE = 'cp_sessions';
 
 add_action( 'init', __NAMESPACE__ . '\\register_sessions_post_type' );
+add_action( 'init', __NAMESPACE__ . '\\session_types_taxonomy');
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\sessions_post_meta_fields' );
-add_action( 'admin_menu' ,__NAMESPACE__. '\\add_session_sub_menu');
-add_action( 'manage_'.SESSION_POST_TYPE.'_posts_custom_column' , __NAMESPACE__.'\\session_additional_columns_data' , 2 , 10 );
-add_filter( 'manage_'.SESSION_POST_TYPE.'_posts_columns' ,__NAMESPACE__.'\\session_additional_columns' , 1 , 10 );
+//add_action( 'admin_menu', __NAMESPACE__ . '\\add_session_sub_menu' );
+add_action( 'manage_' . SESSION_POST_TYPE . '_posts_custom_column', __NAMESPACE__ . '\\session_additional_columns_data', 2, 10 );
+add_filter( 'manage_' . SESSION_POST_TYPE . '_posts_columns', __NAMESPACE__ . '\\session_additional_columns', 1, 10 );
+add_filter( 'manage_edit-'.SESSION_POST_TYPE.'_sortable_columns', __NAMESPACE__ . '\\session_manage_sortable_columns');
 
 function register_sessions_post_type() {
 
@@ -60,7 +62,7 @@ function register_sessions_post_type() {
 		'hierarchical'        => false,
 		'public'              => true,
 		'show_ui'             => true,
-		'show_in_menu'        => false,
+		'show_in_menu'        => true,
 		'menu_position'       => 5,
 		'menu_icon'           => 'dashicons-list-view',
 		'show_in_admin_bar'   => true,
@@ -92,7 +94,7 @@ function sessions_post_meta_fields() {
 			              )
 		              ) )
 		              ->set_duplicates_allowed( false )
-		              ->set_max( 1 )
+		              ->set_max( 2 )
 
 	         ) );
 
@@ -118,30 +120,115 @@ function sessions_post_meta_fields() {
 
 }
 
-function add_session_sub_menu(){
+function add_session_sub_menu() {
 	add_submenu_page(
 		'edit.php?post_type=cp_conferences',
-		__('Sessions',CEYLON_CONF_TEXT_DOMAIN),
-		__('Sessions',CEYLON_CONF_TEXT_DOMAIN),
+		__( 'Sessions', CEYLON_CONF_TEXT_DOMAIN ),
+		__( 'Sessions', CEYLON_CONF_TEXT_DOMAIN ),
 		'manage_options',
-		'edit.php?post_type='.SESSION_POST_TYPE
+		'edit.php?post_type=' . SESSION_POST_TYPE
 	);
 }
 
-function session_additional_columns( $columns ){
-	return array_merge( $columns ,
-		array(
-			'time' => __('Time' , CEYLON_CONF_TEXT_DOMAIN ),
-			'speaker' => __('Speaker' , CEYLON_CONF_TEXT_DOMAIN )
-		));
+function session_additional_columns( $columns ) {
+
+	$columns = array_slice( $columns, 0, 2, true ) + array( 'ccm_session_speakers' => __( 'Speakers', CEYLON_CONF_TEXT_DOMAIN ) ) + array_slice( $columns, 2, null, true );
+	$columns = array_slice( $columns, 0, 1, true ) + array( 'ccm_session_time' => __( 'Time', CEYLON_CONF_TEXT_DOMAIN ) ) + array_slice( $columns, 1, null, true );
+
+	return $columns;
 }
 
-function session_additional_columns_data( $column , $post_id ) {
-	if( $column === 'time'){
-      echo carbon_get_post_meta($post_id,'ccm_start_time');
+function session_additional_columns_data( $column, $post_id ) {
+
+	switch ( $column ){
+		case 'ccm_session_time':
+			$session_time     = absint( carbon_get_post_meta( $post_id, 'ccm_start_time' ) );
+			$session_time = ( $session_time ) ? date( get_option( 'time_format' ), $session_time ) : '&mdash;';
+			echo esc_html( $session_time );
+			break;
+
+		case 'ccm_session_speakers':
+			$speakers     = array();
+			$speakers_ids = array();
+			$speakers_obj =  carbon_get_post_meta( $post_id, 'ccm_session_speaker' );
+
+			if( !empty( $speakers_obj ) ){
+				foreach ( $speakers_obj as $single_speaker ){
+					array_push( $speakers_ids, $single_speaker['id']);
+				}
+			}
+			if ( ! empty( $speakers_obj ) ) {
+				$speakers = get_posts( array(
+					'post_type'      => 'cp_speakers',
+					'posts_per_page' => -1,
+					'post__in'       => $speakers_ids,
+				) );
+			}
+
+			$output = array();
+
+			foreach ( $speakers as $speaker ) {
+				$output[] = sprintf( '<a href="%s">%s</a>', esc_url( get_edit_post_link( $speaker->ID ) ), esc_html( apply_filters( 'the_title', $speaker->post_title ) ) );
+			}
+
+			echo implode( ', ', $output );
+
+			break;
 	}
-	if( $column === 'speaker'){
-		$speaker = carbon_get_post_meta( $post_id ,'ccm_session_speaker');
-		print_r( $speaker );
-	}
+
 }
+
+function session_manage_sortable_columns( $sortable ) {
+
+	$sortable['ccm_session_time'] = '_ccm_session_time';
+
+	return $sortable;
+}
+
+function session_types_taxonomy() {
+
+	$labels = array(
+		'name'                       => _x( 'Types', 'Taxonomy General Name', 'text_domain' ),
+		'singular_name'              => _x( 'Type', 'Taxonomy Singular Name', 'text_domain' ),
+		'menu_name'                  => __( 'Type', 'text_domain' ),
+		'all_items'                  => __( 'All Types', 'text_domain' ),
+		'parent_item'                => __( 'Parent Type', 'text_domain' ),
+		'parent_item_colon'          => __( 'Parent Type:', 'text_domain' ),
+		'new_item_name'              => __( 'New Type Name', 'text_domain' ),
+		'add_new_item'               => __( 'Add New Type', 'text_domain' ),
+		'edit_item'                  => __( 'Edit Type', 'text_domain' ),
+		'update_item'                => __( 'Update Type', 'text_domain' ),
+		'view_item'                  => __( 'View Type', 'text_domain' ),
+		'separate_items_with_commas' => __( 'Separate items with commas', 'text_domain' ),
+		'add_or_remove_items'        => __( 'Add or remove types', 'text_domain' ),
+		'choose_from_most_used'      => __( 'Choose from the most used', 'text_domain' ),
+		'popular_items'              => __( 'Popular Types', 'text_domain' ),
+		'search_items'               => __( 'Search Types', 'text_domain' ),
+		'not_found'                  => __( 'Not Found', 'text_domain' ),
+		'no_terms'                   => __( 'No types', 'text_domain' ),
+		'items_list'                 => __( 'Types list', 'text_domain' ),
+		'items_list_navigation'      => __( 'Types list navigation', 'text_domain' ),
+	);
+	$rewrite = array(
+		'slug'                       => 'sessions-type',
+		'with_front'                 => true,
+		'hierarchical'               => false,
+	);
+	$args = array(
+		'labels'                     => $labels,
+		'hierarchical'               => true,
+		'public'                     => true,
+		'show_ui'                    => true,
+		'show_admin_column'          => true,
+		'show_in_nav_menus'          => true,
+		'show_tagcloud'              => true,
+		'rewrite'                    => $rewrite,
+	);
+	register_taxonomy( 'ccm_session_type', array( SESSION_POST_TYPE ), $args );
+
+}
+
+
+
+
+

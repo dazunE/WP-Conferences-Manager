@@ -10,7 +10,7 @@ const SPEAKER_POST_TYPE = 'cp_speakers';
 
 add_action( 'init', __NAMESPACE__ . '\\register_speakers_post_type' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\speakers_post_meta_fields' );
-add_action( 'admin_menu' ,__NAMESPACE__. '\\add_speaker_sub_menu');
+//add_action( 'admin_menu' ,__NAMESPACE__. '\\add_speaker_sub_menu');
 add_action( 'manage_'.SPEAKER_POST_TYPE.'_posts_custom_column' , __NAMESPACE__.'\\speaker_thumbnail_column' , 2 , 10 );
 add_filter( 'manage_'.SPEAKER_POST_TYPE.'_posts_columns' ,__NAMESPACE__.'\\add_speaker_thumbnail_to_column' , 1 , 10 );
 add_filter( 'manage_'.SPEAKER_POST_TYPE.'_posts_columns' ,__NAMESPACE__.'\\order_of_the_columns' , 1, 20 );
@@ -61,7 +61,7 @@ function register_speakers_post_type() {
 		'hierarchical'        => false,
 		'public'              => true,
 		'show_ui'             => true,
-		'show_in_menu'        => false,
+		'show_in_menu'        => true,
 		'menu_position'       => 5,
 		'menu_icon'           => 'dashicons-megaphone',
 		'show_in_admin_bar'   => true,
