@@ -6,15 +6,15 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 
-
 const CONFERENCE_POST_TYPE = 'ccm_conferences';
 
 add_action( 'init', __NAMESPACE__ . '\\register_conferences_post_type' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\conferences_post_meta_fields' );
-add_action( 'manage_cp_conferences_posts_custom_column' , __NAMESPACE__.'\\sepaker_thumbnail_column' , 2 , 10 );
-add_filter( 'manage_cp_conferences_posts_columns' ,__NAMESPACE__.'\\add_Conference_thumbnail_to_column' , 1 , 10 );
-add_filter( 'single_template' , __NAMESPACE__. '\\conference_single_page_template');
-add_filter( 'body_class', __NAMESPACE__ .'\\hide_header_body_class' );
+add_action( 'manage_cp_conferences_posts_custom_column', __NAMESPACE__ . '\\sepaker_thumbnail_column', 2, 10 );
+add_filter( 'manage_cp_conferences_posts_columns', __NAMESPACE__ . '\\add_Conference_thumbnail_to_column', 1, 10 );
+add_filter( 'single_template', __NAMESPACE__ . '\\conference_single_page_template' );
+add_filter( 'body_class', __NAMESPACE__ . '\\hide_header_body_class' );
+add_filter( 'carbon_fields_association_field_title' , __NAMESPACE__ .'\\fix_the_title' , 5 , 10);
 
 function register_conferences_post_type() {
 
@@ -58,7 +58,7 @@ function register_conferences_post_type() {
 		'label'               => __( 'Conference', CEYLON_CONF_TEXT_DOMAIN ),
 		'description'         => __( 'Conference Manager', CEYLON_CONF_TEXT_DOMAIN ),
 		'labels'              => $labels,
-		'supports'            => array( 'title', 'thumbnail'),
+		'supports'            => array( 'title', 'thumbnail' ),
 		'hierarchical'        => false,
 		'public'              => true,
 		'show_ui'             => true,
@@ -80,14 +80,14 @@ function register_conferences_post_type() {
 
 }
 
-function add_Conference_thumbnail_to_column( $columns ){
-	return array_merge( $columns ,
-		array( 'thumbnail' => __('Conference Logo' , CEYLON_CONF_TEXT_DOMAIN ) ) );
+function add_Conference_thumbnail_to_column( $columns ) {
+	return array_merge( $columns,
+		array( 'thumbnail' => __( 'Conference Logo', CEYLON_CONF_TEXT_DOMAIN ) ) );
 }
 
-function sepaker_thumbnail_column( $column , $post_id  ){
-	if( $column === 'thumbnail'){
-		echo the_post_thumbnail( array(72,72) );
+function sepaker_thumbnail_column( $column, $post_id ) {
+	if ( $column === 'thumbnail' ) {
+		echo the_post_thumbnail( array( 72, 72 ) );
 	}
 }
 
@@ -98,65 +98,66 @@ function conferences_post_meta_fields() {
 	         ->add_fields( array(
 		         Field::make( 'checkbox', 'ccm_page_header', __( 'Hide Header' ) )
 		              ->set_option_value( 'hide' )
-	                  ->set_width( 50 ),
+		              ->set_width( 50 ),
 		         Field::make( 'checkbox', 'ccm_page_title', __( 'Hide Title' ) )
 		              ->set_option_value( 'hide' )
 		              ->set_width( 50 ),
-		         Field::make( 'text', 'ccm_conference_teaser', __( 'Teaser Section' , CEYLON_CONF_TEXT_DOMAIN ) ),
-				 Field::make( 'rich_text', 'ccm_conference_header', __( 'Conference Header', CEYLON_CONF_TEXT_DOMAIN) ),
-		         Field::make( 'rich_text', 'ccm_conference_paragraph', __( 'Conference Description', CEYLON_CONF_TEXT_DOMAIN) ),
-		         Field::make( 'oembed', 'ccm_conference_video', __( 'Conference Video' , CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'text', 'ccm_conference_teaser', __( 'Teaser Section', CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'rich_text', 'ccm_conference_header', __( 'Conference Header', CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'rich_text', 'ccm_conference_paragraph', __( 'Conference Description', CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'oembed', 'ccm_conference_video', __( 'Conference Video', CEYLON_CONF_TEXT_DOMAIN ) ),
 		         Field::make( 'separator', 'crb_separator', __( 'Call to action button' ) ),
-		         Field::make( 'text', 'ccm_conference_button_text', __( 'Button Text' , CEYLON_CONF_TEXT_DOMAIN ) )
-			         ->set_width( 50 ),
-		         Field::make( 'text', 'ccm_conference_button_url', __( 'Button URL' , CEYLON_CONF_TEXT_DOMAIN ) )
+		         Field::make( 'text', 'ccm_conference_button_text', __( 'Button Text', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_width( 50 ),
-		         Field::make( 'rich_text', 'ccm_conference_event_ticket', __( 'Event Ticket', CEYLON_CONF_TEXT_DOMAIN) ),
-		         Field::make( 'complex', 'ccm_sessions_details' , __( 'Session Details' , CEYLON_CONF_TEXT_DOMAIN ) )
+		         Field::make( 'text', 'ccm_conference_button_url', __( 'Button URL', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_width( 50 ),
+		         Field::make( 'rich_text', 'ccm_conference_event_ticket', __( 'Event Ticket', CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'complex', 'ccm_sessions_details', __( 'Session Details', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->add_fields( 'ccm_session_data', __( 'Session Data' ), array(
-			              Field::make( 'text', 'ccm_session_date' , __( 'Session Date' , CEYLON_CONF_TEXT_DOMAIN ) )
-				              ->set_width( 25 ),
-			              Field::make( 'select', 'ccm_session_display' , __( 'Items Per Row' , CEYLON_CONF_TEXT_DOMAIN ) )
-			                   ->set_width( 25 )
-				               ->set_options( array(
-					              '1' => 1,
-					              '2' => 2,
-					              '3' => 3,
-				              ) ),
-			              Field::make( 'association', 'ccm_session' , __( 'Sessions', CEYLON_CONF_TEXT_DOMAIN ) )
-				              ->set_width( 50 )
-				              ->set_types( array(
-					              array(
-						              'type'      => 'post',
-						              'post_type' => 'cp_sessions',
-					              )
-				              ) ),
+			              Field::make( 'select', 'ccm_session_display', __( 'Items Per Row', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 20 )
+			                   ->set_options( array(
+				                   '1' => 1,
+				                   '2' => 2,
+				                   '3' => 3,
+			                   ) ),
+			              Field::make( 'association', 'ccm_session', __( 'Sessions', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 80 )
+				              ->set_duplicates_allowed( false )
+			                   ->set_types( array(
+				                   array(
+					                   'type'      => 'post',
+					                   'post_type' => 'cp_sessions',
+				                   )
+			                   ) ),
 		              ) ),
-		         Field::make( 'complex', 'ccm_conference_why_conference', __( 'Why Guild Conferences', CEYLON_CONF_TEXT_DOMAIN) , array(
-			         Field::make( 'text', 'ccm_why_conference_title' , __( 'Item Title' , CEYLON_CONF_TEXT_DOMAIN ) )
-			              ->set_width( 25 ),
-			         Field::make( 'rich_text', 'ccm_why_conference_paragraph', __( 'Conference Description', CEYLON_CONF_TEXT_DOMAIN) )
-				         ->set_width( 75 ),
-		         ) ),
-		         Field::make( 'rich_text', 'ccm_conference_gurantee', __( 'Conference Guarantee', CEYLON_CONF_TEXT_DOMAIN) ),
-		         Field::make( 'complex', 'ccm_conference_testimonials', __( 'Why Guild Conferences', CEYLON_CONF_TEXT_DOMAIN) , array(
-			         Field::make( 'text', 'ccm_testimonial_person' , __( 'Person' , CEYLON_CONF_TEXT_DOMAIN ) )
-			              ->set_width( 25 ),
-			         Field::make( 'text', 'ccm_testimonial_person_image' , __( 'Person Image' , CEYLON_CONF_TEXT_DOMAIN ) )
-			              ->set_width( 25 ),
-			         Field::make( 'rich_text', 'ccm_why_conference_paragraph', __( 'Testimonials Description', CEYLON_CONF_TEXT_DOMAIN) )
-			              ->set_width( 50 ),
-		         ) )
+		         Field::make( 'complex', 'ccm_conference_why_conference', __( 'Why Guild Conferences', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->add_fields( 'ccm_conference_why_data', __( 'Why Items' ), array(
+			              Field::make( 'text', 'ccm_why_conference_title', __( 'Item Title', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 25 ),
+			              Field::make( 'rich_text', 'ccm_why_conference_paragraph', __( 'Conference Description', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 75 ),
+		              ) ),
+		         Field::make( 'rich_text', 'ccm_conference_gurantee', __( 'Conference Guarantee', CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'complex', 'ccm_conference_testimonials', __( 'Testimonials', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->add_fields( 'ccm_testimonials_data', __( 'Testimonials' ), array(
+			              Field::make( 'text', 'ccm_testimonial_person', __( 'Person', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 25 ),
+			              Field::make( 'image', 'ccm_testimonial_person_image', __( 'Person Image', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 25 ),
+			              Field::make( 'rich_text', 'ccm_why_conference_paragraph', __( 'Testimonials Description', CEYLON_CONF_TEXT_DOMAIN ) )
+			                   ->set_width( 50 ),
+		              ) )
 	         ) );
 
 }
 
-function conference_single_page_template ( $single ) {
+function conference_single_page_template( $single ) {
 
 	global $post;
 
-	if( $post->post_type == CONFERENCE_POST_TYPE ){
-		if ( file_exists( CEYLON_CONF_PLUGIN_PATH . '/includes/conferences/single-conference.php') ){
+	if ( $post->post_type == CONFERENCE_POST_TYPE ) {
+		if ( file_exists( CEYLON_CONF_PLUGIN_PATH . '/includes/conferences/single-conference.php' ) ) {
 			return CEYLON_CONF_PLUGIN_PATH . '/includes/conferences/single-conference.php';
 		}
 	}
@@ -164,13 +165,24 @@ function conference_single_page_template ( $single ) {
 	return $single;
 }
 
-function hide_header_body_class( $classes ){
+function hide_header_body_class( $classes ) {
 
-	global  $post;
+	global $post;
 
-	if ( carbon_get_post_meta( $post->ID ,'ccm_page_header') ){
+	if ( carbon_get_post_meta( $post->ID, 'ccm_page_header' ) ) {
 		$classes[] = 'hide-header';
 	}
 
 	return $classes;
+}
+
+
+function fix_the_title( $title, $name, $id, $type, $subtype ){
+  if( $subtype === 'cp_sessions'){
+  	$suffix = carbon_get_post_meta($id , 'ccm_session_date_label' );
+  	$new_title = $title.'-'.$suffix;
+  	return $new_title;
+  } else {
+  	return $title;
+  }
 }

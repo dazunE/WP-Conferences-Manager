@@ -9,12 +9,12 @@ use Carbon_Fields\Field;
 const SESSION_POST_TYPE = 'cp_sessions';
 
 add_action( 'init', __NAMESPACE__ . '\\register_sessions_post_type' );
-add_action( 'init', __NAMESPACE__ . '\\session_types_taxonomy');
+add_action( 'init', __NAMESPACE__ . '\\session_types_taxonomy' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\sessions_post_meta_fields' );
 //add_action( 'admin_menu', __NAMESPACE__ . '\\add_session_sub_menu' );
 add_action( 'manage_' . SESSION_POST_TYPE . '_posts_custom_column', __NAMESPACE__ . '\\session_additional_columns_data', 2, 10 );
 add_filter( 'manage_' . SESSION_POST_TYPE . '_posts_columns', __NAMESPACE__ . '\\session_additional_columns', 1, 10 );
-add_filter( 'manage_edit-'.SESSION_POST_TYPE.'_sortable_columns', __NAMESPACE__ . '\\session_manage_sortable_columns');
+add_filter( 'manage_edit-' . SESSION_POST_TYPE . '_sortable_columns', __NAMESPACE__ . '\\session_manage_sortable_columns' );
 
 function register_sessions_post_type() {
 
@@ -84,7 +84,6 @@ function sessions_post_meta_fields() {
 
 	Container::make( 'post_meta', __( 'Speaker Information', CEYLON_CONF_TEXT_DOMAIN ) )
 	         ->where( 'post_type', '=', SESSION_POST_TYPE )
-	         ->set_context( 'side' )
 	         ->add_fields( array(
 		         Field::make( 'association', 'ccm_session_speaker', __( 'Session Speaker', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_types( array(
@@ -102,11 +101,13 @@ function sessions_post_meta_fields() {
 	         ->where( 'post_type', '=', SESSION_POST_TYPE )
 	         ->set_context( 'side' )
 	         ->add_fields( array(
-		         Field::make( 'date', 'ccm_session_date', __( 'Event Start Date', CEYLON_CONF_TEXT_DOMAIN ) )
+		         Field::make( 'date', 'ccm_session_date', __( 'Session Date', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_attribute( 'placeholder', __( 'Date of event start', CEYLON_CONF_TEXT_DOMAIN ) )
-		              ->set_storage_format( 'Y-m-d' ),
+		              ->set_storage_format( get_option( 'date_format' ) ),
+		         Field::make( 'text' , 'ccm_session_date_label' , __( 'Date Label', CEYLON_CONF_TEXT_DOMAIN ) ),
 		         Field::make( 'time', 'ccm_start_time', __( 'Starting time', CEYLON_CONF_TEXT_DOMAIN ) )
-		              ->set_attribute( 'placeholder', 'Session Start Time', CEYLON_CONF_TEXT_DOMAIN ),
+		              ->set_attribute( 'placeholder', 'Session Start Time', CEYLON_CONF_TEXT_DOMAIN )
+	         ->set_storage_format( get_option( 'time_format' ) ),
 		         Field::make( 'select', 'ccm_session_type', __( 'Session Type', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_options( array(
 			              'regular' => __( 'Regular Session', CEYLON_CONF_TEXT_DOMAIN ),
@@ -133,6 +134,7 @@ function add_session_sub_menu() {
 function session_additional_columns( $columns ) {
 
 	$columns = array_slice( $columns, 0, 2, true ) + array( 'ccm_session_speakers' => __( 'Speakers', CEYLON_CONF_TEXT_DOMAIN ) ) + array_slice( $columns, 2, null, true );
+	$columns = array_slice( $columns, 0, 1, true ) + array( 'ccm_session_date' => __( 'Session Date', CEYLON_CONF_TEXT_DOMAIN ) ) + array_slice( $columns, 1, null, true );
 	$columns = array_slice( $columns, 0, 1, true ) + array( 'ccm_session_time' => __( 'Time', CEYLON_CONF_TEXT_DOMAIN ) ) + array_slice( $columns, 1, null, true );
 
 	return $columns;
@@ -140,27 +142,32 @@ function session_additional_columns( $columns ) {
 
 function session_additional_columns_data( $column, $post_id ) {
 
-	switch ( $column ){
+	switch ( $column ) {
 		case 'ccm_session_time':
-			$session_time     = absint( carbon_get_post_meta( $post_id, 'ccm_start_time' ) );
-			$session_time = ( $session_time ) ? date( get_option( 'time_format' ), $session_time ) : '&mdash;';
+			$session_time = carbon_get_post_meta( $post_id, 'ccm_start_time' ) ;
+			$session_time = ( $session_time ) ? $session_time  : '&mdash;';
 			echo esc_html( $session_time );
+			break;
+
+		case 'ccm_session_date':
+			$session_date = carbon_get_post_meta( $post_id, 'ccm_session_date' );
+			echo esc_html( $session_date );
 			break;
 
 		case 'ccm_session_speakers':
 			$speakers     = array();
 			$speakers_ids = array();
-			$speakers_obj =  carbon_get_post_meta( $post_id, 'ccm_session_speaker' );
+			$speakers_obj = carbon_get_post_meta( $post_id, 'ccm_session_speaker' );
 
-			if( !empty( $speakers_obj ) ){
-				foreach ( $speakers_obj as $single_speaker ){
-					array_push( $speakers_ids, $single_speaker['id']);
+			if ( ! empty( $speakers_obj ) ) {
+				foreach ( $speakers_obj as $single_speaker ) {
+					array_push( $speakers_ids, $single_speaker['id'] );
 				}
 			}
 			if ( ! empty( $speakers_obj ) ) {
 				$speakers = get_posts( array(
 					'post_type'      => 'cp_speakers',
-					'posts_per_page' => -1,
+					'posts_per_page' => - 1,
 					'post__in'       => $speakers_ids,
 				) );
 			}
@@ -181,13 +188,14 @@ function session_additional_columns_data( $column, $post_id ) {
 function session_manage_sortable_columns( $sortable ) {
 
 	$sortable['ccm_session_time'] = '_ccm_session_time';
+	$sortable['ccm_session_date'] = 'ccm_session_date';
 
 	return $sortable;
 }
 
 function session_types_taxonomy() {
 
-	$labels = array(
+	$labels  = array(
 		'name'                       => _x( 'Types', 'Taxonomy General Name', 'text_domain' ),
 		'singular_name'              => _x( 'Type', 'Taxonomy Singular Name', 'text_domain' ),
 		'menu_name'                  => __( 'Type', 'text_domain' ),
@@ -210,19 +218,19 @@ function session_types_taxonomy() {
 		'items_list_navigation'      => __( 'Types list navigation', 'text_domain' ),
 	);
 	$rewrite = array(
-		'slug'                       => 'sessions-type',
-		'with_front'                 => true,
-		'hierarchical'               => false,
+		'slug'         => 'sessions-type',
+		'with_front'   => true,
+		'hierarchical' => false,
 	);
-	$args = array(
-		'labels'                     => $labels,
-		'hierarchical'               => true,
-		'public'                     => true,
-		'show_ui'                    => true,
-		'show_admin_column'          => true,
-		'show_in_nav_menus'          => true,
-		'show_tagcloud'              => true,
-		'rewrite'                    => $rewrite,
+	$args    = array(
+		'labels'            => $labels,
+		'hierarchical'      => true,
+		'public'            => true,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'show_in_nav_menus' => true,
+		'show_tagcloud'     => true,
+		'rewrite'           => $rewrite,
 	);
 	register_taxonomy( 'ccm_session_type', array( SESSION_POST_TYPE ), $args );
 
