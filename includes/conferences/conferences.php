@@ -115,15 +115,15 @@ function conferences_post_meta_fields() {
 		         Field::make( 'complex', 'ccm_sessions_details', __( 'Session Details', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->add_fields( 'ccm_session_data', __( 'Session Data' ), array(
 			              Field::make( 'select', 'ccm_session_display', __( 'Items Per Row', CEYLON_CONF_TEXT_DOMAIN ) )
-			                   ->set_width( 20 )
+			                   ->set_width( 10 )
 			                   ->set_options( array(
 				                   '1' => 1,
 				                   '2' => 2,
 				                   '3' => 3,
 			                   ) ),
-			              Field::make( 'association', 'ccm_session', __( 'Sessions', CEYLON_CONF_TEXT_DOMAIN ) )
-			                   ->set_width( 80 )
+			              Field::make( 'association', 'ccm_session_post_type', __( 'Sessions', CEYLON_CONF_TEXT_DOMAIN ) )
 				              ->set_duplicates_allowed( false )
+			                   ->set_width( 90 )
 			                   ->set_types( array(
 				                   array(
 					                   'type'      => 'post',
@@ -180,7 +180,8 @@ function hide_header_body_class( $classes ) {
 function fix_the_title( $title, $name, $id, $type, $subtype ){
   if( $subtype === 'cp_sessions'){
   	$suffix = carbon_get_post_meta($id , 'ccm_session_date_label' );
-  	$new_title = $title.'-'.$suffix;
+  	$time = carbon_get_post_meta( $id , 'ccm_start_time');
+  	$new_title = $title.'-'.$suffix.' ('.$time.')';
   	return $new_title;
   } else {
   	return $title;
