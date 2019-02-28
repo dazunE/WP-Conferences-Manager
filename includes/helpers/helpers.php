@@ -54,7 +54,7 @@ function get_session_data_by_id( $session_id ) {
 		}
 
 		echo sprintf(
-			'<h4>%s<span>-</span></h4><span class="speaker-name">%s</span>',
+			'<h4>%s<span>-</span><span class="speaker-name">%s</span></h4>',
 			$post->post_title,
 			implode( ",", $speaker_collections ) );
 
@@ -90,10 +90,10 @@ function get_conference_header_section( $conference_id ) {
 	$conference_purchase_url = carbon_get_post_meta( $conference_id, 'ccm_conference_button_url' );
 
 	if ( ! $page_title ) {
-		echo sprintf( '<h2>%s</h2>', get_the_title( $conference_id ) );
+		echo sprintf( '<h3>%s</h3>', get_the_title( $conference_id ) );
 	}
 	if ( ! empty( $page_teaser ) ) {
-		echo sprintf( '<h2>%s</h2>', $page_teaser );
+		echo sprintf( '<h3>%s</h3>', $page_teaser );
 	}
 	if ( ! empty( $conference_header ) ) {
 		echo sprintf( '<div>%s</div>', wpautop( $conference_header ) );
@@ -101,11 +101,77 @@ function get_conference_header_section( $conference_id ) {
 	if ( ! empty( $conference_intro ) ) {
 		echo sprintf( '<div class="conference-intro">%s</div>', wpautop( $conference_intro ) );
 	}
-	if ( !empty( $conference_button) ){
-		echo  sprintf( '<a href="%s" class="btn conference-purchase-btn">%s</a>', esc_url($conference_purchase_url), $conference_button  );
+	if ( ! empty( $conference_button ) ) {
+		echo sprintf( '<a href="%s" class="btn conference-purchase-btn">%s</a>', esc_url( $conference_purchase_url ), $conference_button );
 	}
 	if ( ! empty( $conference_video ) ) {
 		echo sprintf( '<div class="conference-video">%s</div>', wp_oembed_get( $conference_video )
+		);
+	}
+
+}
+
+function get_conference_middle_section( $conference_id ) {
+
+	$ticket_details = carbon_get_post_meta( $conference_id, 'ccm_conference_event_ticket' );
+	$session_intro  = carbon_get_post_meta( $conference_id, 'ccm_session_intro' );
+
+	if ( ! empty( $ticket_details ) ) {
+		echo sprintf( '<div class="conference-ticket-content">%s</div>', wpautop( $ticket_details ) );
+	}
+
+	if ( ! empty( $session_intro ) ) {
+		echo sprintf( '<h3 class="session-intro">%s</h3>', $session_intro );
+	}
+}
+
+function get_conference_bottom_section( $conference_id ) {
+
+	$why_conference_title    = carbon_get_post_meta( $conference_id, 'ccm_why_title' );
+	$why_conference_data     = carbon_get_post_meta( $conference_id, 'ccm_conference_why_conference' );
+	$conference_guarantee    = carbon_get_post_meta( $conference_id, 'ccm_conference_gurantee' );
+	$conference_testimonials = carbon_get_post_meta( $conference_id, 'ccm_testimonials' );
+
+	$item = 0;
+
+	echo sprintf( '<h3>%s</h3>', $why_conference_title );
+
+	if ( ! empty( $why_conference_data ) ) {
+
+		foreach ( $why_conference_data as $single_item ) {
+
+			$item ++;
+
+			echo sprintf(
+				'<div class="why-item"><div class="item-number">%s</div><h4>%s</h4>%s</div>',
+				$item,
+				$single_item['ccm_why_conference_title'],
+				wpautop( $single_item['ccm_why_conference_paragraph'] )
+			);
+
+		}
+	}
+
+	if ( ! empty( $conference_guarantee ) ) {
+		echo sprintf( '<div class="conference-gurantee">%s</div>', wpautop( $conference_guarantee ) );
+	}
+
+	if ( ! empty( $conference_testimonials ) ) {
+		echo sprintf( '<div class="testimonials">%s</div>', get_posts_from_collection( $conference_testimonials ) );
+	}
+
+}
+
+function get_posts_from_collection( $collection ) {
+
+	foreach ( $collection as $single_item ) {
+		$post = get_post( absint( $single_item['id'] ) );
+		echo sprintf(
+			'<div class="single-testimonial"><h4>%s</h4>%s<div class="thumbnail">%s</div></div>',
+			$post->post_title,
+			$post->post_content,
+			get_the_post_thumbnail( $post, array( 100, 100 ) )
+
 		);
 	}
 

@@ -112,6 +112,7 @@ function conferences_post_meta_fields() {
 		         Field::make( 'text', 'ccm_conference_button_url', __( 'Button URL', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_width( 50 ),
 		         Field::make( 'rich_text', 'ccm_conference_event_ticket', __( 'Event Ticket', CEYLON_CONF_TEXT_DOMAIN ) ),
+		         Field::make( 'text', 'ccm_session_intro', __( 'Session Intro' , CEYLON_CONF_TEXT_DOMAIN ) ),
 		         Field::make( 'complex', 'ccm_sessions_details', __( 'Session Details', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->add_fields( 'ccm_session_data', __( 'Session Data' ), array(
 			              Field::make( 'select', 'ccm_session_display', __( 'Items Per Row', CEYLON_CONF_TEXT_DOMAIN ) )
@@ -131,6 +132,8 @@ function conferences_post_meta_fields() {
 				                   )
 			                   ) ),
 		              ) ),
+		         Field::make( 'text', 'ccm_why_title', __( 'Why Conference Title' , CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_default_value('Why Guild Conferences?'),
 		         Field::make( 'complex', 'ccm_conference_why_conference', __( 'Why Guild Conferences', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->add_fields( 'ccm_conference_why_data', __( 'Why Items' ), array(
 			              Field::make( 'text', 'ccm_why_conference_title', __( 'Item Title', CEYLON_CONF_TEXT_DOMAIN ) )

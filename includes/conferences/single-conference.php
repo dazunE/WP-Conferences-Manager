@@ -10,7 +10,13 @@ get_header();
                 </div>
 				<?php Helpers\get_conference_header_section( get_the_ID() ); ?>
             </div>
+            <div class="conference-content">
+                <?php Helpers\get_conference_middle_section( get_the_ID() );?>
+            </div>
 			<?php Helpers\session_list_display( get_the_ID(), 'ccm_sessions_details' );?>
+            <div class="conference-bottom-content">
+                <?php Helpers\get_conference_bottom_section( get_the_ID() ); ?>
+            </div>
 		<?php endwhile; ?>
     </div>
 <?php

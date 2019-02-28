@@ -8,6 +8,17 @@
     margin-bottom: 20px;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
+}
+
+.single-conferences h1,
+.single-conferences h2,
+.single-conferences h3,
+.single-conferences h4,
+.single-conferences h5,
+.single-conferences h6,
+.single-conferences p{
+    margin: 0;
 }
 
 .conference-logo{
