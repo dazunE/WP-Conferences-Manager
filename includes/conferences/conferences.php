@@ -127,7 +127,7 @@ function conferences_post_meta_fields() {
 			                   ->set_types( array(
 				                   array(
 					                   'type'      => 'post',
-					                   'post_type' => 'cp_sessions',
+					                   'post_type' => 'ccm_sessions',
 				                   )
 			                   ) ),
 		              ) ),
@@ -139,15 +139,15 @@ function conferences_post_meta_fields() {
 			                   ->set_width( 75 ),
 		              ) ),
 		         Field::make( 'rich_text', 'ccm_conference_gurantee', __( 'Conference Guarantee', CEYLON_CONF_TEXT_DOMAIN ) ),
-		         Field::make( 'complex', 'ccm_conference_testimonials', __( 'Testimonials', CEYLON_CONF_TEXT_DOMAIN ) )
-		              ->add_fields( 'ccm_testimonials_data', __( 'Testimonials' ), array(
-			              Field::make( 'text', 'ccm_testimonial_person', __( 'Person', CEYLON_CONF_TEXT_DOMAIN ) )
-			                   ->set_width( 25 ),
-			              Field::make( 'image', 'ccm_testimonial_person_image', __( 'Person Image', CEYLON_CONF_TEXT_DOMAIN ) )
-			                   ->set_width( 25 ),
-			              Field::make( 'rich_text', 'ccm_why_conference_paragraph', __( 'Testimonials Description', CEYLON_CONF_TEXT_DOMAIN ) )
-			                   ->set_width( 50 ),
+		         Field::make( 'association', 'ccm_testimonials', __( 'Testimonials' ) )
+		              ->set_types( array(
+			              array(
+				              'type'      => 'post',
+				              'post_type' => 'ccm_testimonials',
+			              )
 		              ) )
+
+
 	         ) );
 
 }
@@ -178,7 +178,7 @@ function hide_header_body_class( $classes ) {
 
 
 function fix_the_title( $title, $name, $id, $type, $subtype ){
-  if( $subtype === 'cp_sessions'){
+  if( $subtype === 'ccm_sessions'){
   	$suffix = carbon_get_post_meta($id , 'ccm_session_date_label' );
   	$time = carbon_get_post_meta( $id , 'ccm_start_time');
   	$new_title = $title.'-'.$suffix.' ('.$time.')';

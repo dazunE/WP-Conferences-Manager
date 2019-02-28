@@ -6,7 +6,7 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 
-const SESSION_POST_TYPE = 'cp_sessions';
+const SESSION_POST_TYPE = 'ccm_sessions';
 
 add_action( 'init', __NAMESPACE__ . '\\register_sessions_post_type' );
 add_action( 'init', __NAMESPACE__ . '\\session_types_taxonomy' );
@@ -89,7 +89,7 @@ function sessions_post_meta_fields() {
 		              ->set_types( array(
 			              array(
 				              'type'      => 'post',
-				              'post_type' => 'cp_speakers',
+				              'post_type' => 'ccm_speakers',
 			              )
 		              ) )
 		              ->set_duplicates_allowed( false )
@@ -169,7 +169,7 @@ function session_additional_columns_data( $column, $post_id ) {
 			}
 			if ( ! empty( $speakers_obj ) ) {
 				$speakers = get_posts( array(
-					'post_type'      => 'cp_speakers',
+					'post_type'      => 'ccm_speakers',
 					'posts_per_page' => - 1,
 					'post__in'       => $speakers_ids,
 				) );

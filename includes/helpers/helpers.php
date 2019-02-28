@@ -49,11 +49,11 @@ function get_session_data_by_id( $session_id ) {
 
 	$post = get_post($session_id );
 
-
 	?>
 
 	<div class="single-session">
-		<h4><?php echo $post->post_title; ?></h4>
+        <?php get_speaker_by_session_id( $session_id ) ;?>
+		<h4><?php echo $post->post_title;?> - <?php get_speaker_name_by_id( $session_id) ;?></h4>
 		<p class="session-time">
 			<span class="start-time">
 				<?php echo carbon_get_post_meta( $session_id , 'ccm_start_time')?>
@@ -70,7 +70,36 @@ function get_session_data_by_id( $session_id ) {
 
 }
 
-function get_session_date_by_id( $session_id ) {
+function get_session_date_by_id( $id ) {
 
-	return carbon_get_post_meta( $session_id, 'ccm_session_date' );
+	return carbon_get_post_meta( $id, 'ccm_session_date' );
+}
+
+function get_speaker_by_session_id( $id ){
+
+  $speakers = carbon_get_post_meta( $id, 'ccm_session_speaker');
+
+  if( !empty( $speakers ) ) {
+      foreach ( $speakers as $speaker ){
+          echo sprintf(
+                  '<div class="speaker-avatar">%s</div>',
+                  get_the_post_thumbnail( $speaker['id'] , array(120,120))
+          );
+      }
+  }
+}
+
+function get_speaker_name_by_id( $id ){
+
+	$speakers = carbon_get_post_meta( $id, 'ccm_session_speaker');
+
+	if( !empty( $speakers ) ) {
+		foreach ( $speakers as $speaker ){
+			echo sprintf(
+				'<span class="speaker-title">%s</span>'
+                ,get_the_title($speaker['id'])
+			);
+		}
+	}
+
 }

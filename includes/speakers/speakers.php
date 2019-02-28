@@ -6,7 +6,7 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 
-const SPEAKER_POST_TYPE = 'cp_speakers';
+const SPEAKER_POST_TYPE = 'ccm_speakers';
 
 add_action( 'init', __NAMESPACE__ . '\\register_speakers_post_type' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\speakers_post_meta_fields' );

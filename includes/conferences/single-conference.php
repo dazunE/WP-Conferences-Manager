@@ -5,16 +5,22 @@ use Conferences\Helpers;
 global $post;
 
 get_header();
+
 ?>
-<pre>
+
+<div class="single-conferences" id="conferences-<?php echo $post->ID; ?>">
+
+
 	<?php
 
-	Helpers\session_list_display( $post->ID, 'ccm_sessions_details');
+	Helpers\session_list_display( $post->ID, 'ccm_sessions_details' );
 
 	?>
-</pre>
+
+</div>
 
 <?php
+
 get_footer();
 
 ?>
