@@ -111,6 +111,8 @@ function sessions_post_meta_fields() {
 		         Field::make( 'time', 'ccm_end_time', __( 'Ending time', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_attribute( 'placeholder', 'Session End Time', CEYLON_CONF_TEXT_DOMAIN )
 		              ->set_storage_format( get_option( 'time_format' ) ),
+		         Field::make( 'text', 'ccm_session_timezone', __( 'Time Zone', CEYLON_CONF_TEXT_DOMAIN ) )
+		              ->set_default_value('EDT'),
 		         Field::make( 'select', 'ccm_session_type', __( 'Session Type', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->set_options( array(
 			              'regular' => __( 'Regular Session', CEYLON_CONF_TEXT_DOMAIN ),

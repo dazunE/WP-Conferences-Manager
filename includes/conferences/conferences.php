@@ -176,7 +176,6 @@ function hide_header_body_class( $classes ) {
 	return $classes;
 }
 
-
 function fix_the_title( $title, $name, $id, $type, $subtype ){
   if( $subtype === 'ccm_sessions'){
   	$suffix = carbon_get_post_meta($id , 'ccm_session_date_label' );
@@ -187,3 +186,4 @@ function fix_the_title( $title, $name, $id, $type, $subtype ){
   	return $title;
   }
 }
+
