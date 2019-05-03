@@ -6,8 +6,6 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 
-const SESSION_POST_TYPE = 'ccm_sessions';
-
 add_action( 'init', __NAMESPACE__ . '\\register_sessions_post_type' );
 add_action( 'init', __NAMESPACE__ . '\\session_types_taxonomy' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\sessions_post_meta_fields' );
@@ -48,7 +46,7 @@ function register_sessions_post_type() {
 	);
 
 	$rewrite = array(
-		'slug'       => 'sessions',
+		'slug'       => 'conference-sessions',
 		'with_front' => true,
 		'pages'      => true,
 		'feeds'      => true,
@@ -68,7 +66,7 @@ function register_sessions_post_type() {
 		'show_in_admin_bar'   => true,
 		'show_in_nav_menus'   => true,
 		'can_export'          => true,
-		'has_archive'         => 'sessions',
+		'has_archive'         => 'conference-sessions',
 		'exclude_from_search' => false,
 		'publicly_queryable'  => true,
 		'rewrite'             => $rewrite,
@@ -93,7 +91,6 @@ function sessions_post_meta_fields() {
 			              )
 		              ) )
 		              ->set_duplicates_allowed( false )
-		              ->set_max( 2 )
 
 	         ) );
 

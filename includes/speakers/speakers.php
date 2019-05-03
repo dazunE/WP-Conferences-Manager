@@ -6,14 +6,12 @@ use Carbon_Fields\Container;
 use Carbon_Fields\Field;
 
 
-const SPEAKER_POST_TYPE = 'ccm_speakers';
-
 add_action( 'init', __NAMESPACE__ . '\\register_speakers_post_type' );
 add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\speakers_post_meta_fields' );
 //add_action( 'admin_menu' ,__NAMESPACE__. '\\add_speaker_sub_menu');
-add_action( 'manage_'.SPEAKER_POST_TYPE.'_posts_custom_column' , __NAMESPACE__.'\\speaker_thumbnail_column' , 2 , 10 );
-add_filter( 'manage_'.SPEAKER_POST_TYPE.'_posts_columns' ,__NAMESPACE__.'\\add_speaker_thumbnail_to_column' , 1 , 10 );
-add_filter( 'manage_'.SPEAKER_POST_TYPE.'_posts_columns' ,__NAMESPACE__.'\\order_of_the_columns' , 1, 20 );
+add_action( 'manage_' . SPEAKER_POST_TYPE . '_posts_custom_column', __NAMESPACE__ . '\\speaker_thumbnail_column', 2, 10 );
+add_filter( 'manage_' . SPEAKER_POST_TYPE . '_posts_columns', __NAMESPACE__ . '\\add_speaker_thumbnail_to_column', 1, 10 );
+add_filter( 'manage_' . SPEAKER_POST_TYPE . '_posts_columns', __NAMESPACE__ . '\\order_of_the_columns', 1, 20 );
 
 function register_speakers_post_type() {
 
@@ -79,30 +77,41 @@ function register_speakers_post_type() {
 
 }
 
-function add_speaker_thumbnail_to_column( $columns ){
-	return array_merge( $columns ,
-		array( 'thumbnail' => __('Speaker Avatar' , CEYLON_CONF_TEXT_DOMAIN ) ) );
+function add_speaker_thumbnail_to_column( $columns ) {
+
+	return array_merge( $columns,
+		array(
+			'thumbnail'  => __( 'Speaker Avatar', CEYLON_CONF_TEXT_DOMAIN ),
+			'speaker_id' => __( 'Speaker Id', CEYLON_CONF_TEXT_DOMAIN )
+		) );
 }
 
-function order_of_the_columns($defaults) {
 
-	$new = array();
-	$tags = $defaults['thumbnail'];  // save the tags column
-	unset($defaults['thumbnail']);   // remove it from the columns list
+function order_of_the_columns( $defaults ) {
 
-	foreach($defaults as $key=>$value) {
-		if($key=='date') {  // when we find the date column
-			$new['thumbnail'] = $tags;  // put the tags column before it
+	$new        = array();
+	$image      = $defaults['thumbnail'];  // save the image column
+	$speaker_id = $defaults['speaker_id'];
+	unset( $defaults['thumbnail'] );   // remove it from the columns list
+	unset( $defaults['speaker_id'] );
+
+	foreach ( $defaults as $key => $value ) {
+		if ( $key == 'date' ) {  // when we find the date column
+			$new['speaker_id'] = $speaker_id;
+			$new['thumbnail']  = $image;  // put the image column before it
 		}
-		$new[$key]=$value;
+		$new[ $key ] = $value;
 	}
 
 	return $new;
 }
 
-function speaker_thumbnail_column( $column , $post_id  ){
-	if( $column === 'thumbnail'){
-		echo the_post_thumbnail( array(72,72) );
+function speaker_thumbnail_column( $column, $post_id ) {
+	if ( $column === 'thumbnail' ) {
+		echo the_post_thumbnail( array( 72, 72 ) );
+	}
+	if( $column === 'speaker_id' ) {
+		echo '<pre>'.$post_id.'</pre>';
 	}
 }
 
@@ -110,33 +119,33 @@ function speakers_post_meta_fields() {
 
 	Container::make( 'post_meta', __( 'Speaker Information', CEYLON_CONF_TEXT_DOMAIN ) )
 	         ->where( 'post_type', '=', SPEAKER_POST_TYPE )
-			 ->set_context( 'side' )
+	         ->set_context( 'side' )
 	         ->add_fields( array(
 		         Field::make( 'complex', 'ccm_social_links', __( 'Social Links', CEYLON_CONF_TEXT_DOMAIN ) )
 		              ->add_fields( 'ccm_links', array(
 			              Field::make( 'select', 'ccm_social_network_type', __( 'Select a network' ) )
 			                   ->set_options( array(
 				                   'facebook' => 'Facebook',
-				                   'twitter' => 'Twitter',
+				                   'twitter'  => 'Twitter',
 				                   'whatsapp' => 'WhatsApp',
-				                   'linkdin' => 'LinkdIn',
-				                   'youtube' => 'YouTube',
+				                   'linkdin'  => 'LinkdIn',
+				                   'youtube'  => 'YouTube',
 			                   ) )
-							   ->set_default_value('facebook'),
+			                   ->set_default_value( 'facebook' ),
 			              Field::make( 'text', 'ccm_social_network_link', __( 'Social Profile Link' ) )
-			              ->set_attribute('type','url')
+			                   ->set_attribute( 'type', 'url' )
 		              ) )
 
 	         ) );
 
 }
 
-function add_speaker_sub_menu(){
+function add_speaker_sub_menu() {
 	add_submenu_page(
 		'edit.php?post_type=cp_conferences',
-		__('Speakers',CEYLON_CONF_TEXT_DOMAIN),
-		__('Speakers',CEYLON_CONF_TEXT_DOMAIN),
+		__( 'Speakers', CEYLON_CONF_TEXT_DOMAIN ),
+		__( 'Speakers', CEYLON_CONF_TEXT_DOMAIN ),
 		'manage_options',
-		'edit.php?post_type='.SPEAKER_POST_TYPE
+		'edit.php?post_type=' . SPEAKER_POST_TYPE
 	);
 }

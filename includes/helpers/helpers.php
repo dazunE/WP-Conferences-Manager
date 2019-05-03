@@ -14,14 +14,15 @@ function session_list_display( $id, $meta_field ) {
 		$day = 0;
 
 		foreach ( $session_data as $session ) {
+
 			$day ++;
 			$rows          = $session['ccm_session_display'];
 			$first_session = $session['ccm_session_post_type'][0]['id'];
 			$date          = 'Day 0' . $day . ' - ' . get_session_date_by_id( $first_session );
 			echo sprintf(
-				'<div class="sessions-wrap">
-			    			<h3>%s</h3>
-			    		<div class="sessions-row columns-%s">',
+				'<div class="conf_sessions">
+			    			<h3 class="conf_sessions__title">%s</h3>
+			    		<div class="conf_sessions__row columns__%s">',
 				$date,
 				$rows
 			);
@@ -34,6 +35,9 @@ function session_list_display( $id, $meta_field ) {
 	}
 }
 
+/**
+ * @param $session_id
+ */
 function get_session_data_by_id( $session_id ) {
 
 	$post = get_post( $session_id );
@@ -42,30 +46,34 @@ function get_session_data_by_id( $session_id ) {
 
 
 	?>
-    <div class="single-session">
+    <div class="conf_sessions__single <?php echo 'sepeakers-' . sizeof( $speakers ); ?>">
 		<?php
 
 		$speaker_collections = array();
 
+
 		foreach ( $speakers as $speaker ) {
-			echo sprintf( '<div class="speaker-image">%s</div>',
+
+
+			echo sprintf( '<div class="speaker__image">%s</div>',
 				get_the_post_thumbnail( $speaker['id'], array( 100, 100 ) ) );
 			array_push( $speaker_collections, get_the_title( $speaker['id'] ) );
 		}
 
 		echo sprintf(
-			'<h4>%s<span>-</span><span class="speaker-name">%s</span></h4>',
-			$post->post_title,
-			implode( ",", $speaker_collections ) );
-
-		echo sprintf(
-			'<p class="session-time"><span>%s</span>-<span>%s</span><span>(%s)</span></p>',
+			'<p class="conf_sessions__time"><span>%s</span>-<span>%s</span><span>(%s)</span></p>',
 			carbon_get_post_meta( $session_id, 'ccm_start_time' ),
 			carbon_get_post_meta( $session_id, 'ccm_end_time' ),
 			carbon_get_post_meta( $session_id, 'ccm_session_timezone' )
 		);
 
-		echo sprintf( '<div class="session-description">%s</div>', $post->post_content );
+		echo sprintf(
+			'<h4>%s<span>&nbsp;-&nbsp;</span><span class="speaker__name">%s</span></h4>',
+			$post->post_title,
+			implode( ", ", $speaker_collections ) );
+
+
+		echo sprintf( '<div class="session_content">%s</div>', $post->post_content );
 
 		?>
     </div>
@@ -96,16 +104,16 @@ function get_conference_header_section( $conference_id ) {
 		echo sprintf( '<h3>%s</h3>', $page_teaser );
 	}
 	if ( ! empty( $conference_header ) ) {
-		echo sprintf( '<div>%s</div>', wpautop( $conference_header ) );
+		echo sprintf( '<div class="conf_header__paragraph">%s</div>', wpautop( $conference_header ) );
 	}
 	if ( ! empty( $conference_intro ) ) {
-		echo sprintf( '<div class="conference-intro">%s</div>', wpautop( $conference_intro ) );
+		echo sprintf( '<div class="conf_header__intro">%s</div>', wpautop( $conference_intro ) );
 	}
 	if ( ! empty( $conference_button ) ) {
-		echo sprintf( '<a href="%s" class="btn conference-purchase-btn">%s</a>', esc_url( $conference_purchase_url ), $conference_button );
+		echo sprintf( '<div class="conf_header__cta"><a href="%s" class="btn purchase_btn">%s</a></div> ', esc_url( $conference_purchase_url ), $conference_button );
 	}
 	if ( ! empty( $conference_video ) ) {
-		echo sprintf( '<div class="conference-video">%s</div>', wp_oembed_get( $conference_video )
+		echo sprintf( '<div class="conf_header__video">%s</div>', wp_oembed_get( $conference_video )
 		);
 	}
 
@@ -117,11 +125,11 @@ function get_conference_middle_section( $conference_id ) {
 	$session_intro  = carbon_get_post_meta( $conference_id, 'ccm_session_intro' );
 
 	if ( ! empty( $ticket_details ) ) {
-		echo sprintf( '<div class="conference-ticket-content">%s</div>', wpautop( $ticket_details ) );
+		echo sprintf( '<div class="conf_content__ticket">%s</div>', wpautop( $ticket_details ) );
 	}
 
 	if ( ! empty( $session_intro ) ) {
-		echo sprintf( '<h3 class="session-intro">%s</h3>', $session_intro );
+		echo sprintf( '<h3 class="conf_content__session-intro">%s</h3>', $session_intro );
 	}
 }
 
@@ -143,7 +151,7 @@ function get_conference_bottom_section( $conference_id ) {
 			$item ++;
 
 			echo sprintf(
-				'<div class="why-item"><div class="item-number">%s</div><h4>%s</h4>%s</div>',
+				'<div class="conf_why__item"><div class="conf_why__item-number">%s</div><h4>%s</h4>%s</div>',
 				$item,
 				$single_item['ccm_why_conference_title'],
 				wpautop( $single_item['ccm_why_conference_paragraph'] )
@@ -153,26 +161,67 @@ function get_conference_bottom_section( $conference_id ) {
 	}
 
 	if ( ! empty( $conference_guarantee ) ) {
-		echo sprintf( '<div class="conference-gurantee">%s</div>', wpautop( $conference_guarantee ) );
+		echo sprintf( '<div class="conf_guarantee">%s</div>', wpautop( $conference_guarantee ) );
 	}
 
 	if ( ! empty( $conference_testimonials ) ) {
-		echo sprintf( '<div class="testimonials">%s</div>', get_posts_from_collection( $conference_testimonials ) );
+		get_posts_from_collection( $conference_testimonials );
 	}
 
 }
 
 function get_posts_from_collection( $collection ) {
 
+	echo '<div class="conf_testimonials"><h3>What Past Attendees Are Saying</h3>';
+
 	foreach ( $collection as $single_item ) {
 		$post = get_post( absint( $single_item['id'] ) );
 		echo sprintf(
-			'<div class="single-testimonial"><h4>%s</h4>%s<div class="thumbnail">%s</div></div>',
-			$post->post_title,
+			'<div class="conf_testimonial__items">%s<p> ~ <i>%s</i></p><div class="conf_testimonial__item-image">%s</div></div>',
 			$post->post_content,
+			$post->post_title,
 			get_the_post_thumbnail( $post, array( 100, 100 ) )
 
 		);
+	}
+
+	echo '</div>';
+
+}
+
+function get_the_speaker_profile_by_id ( $id , $bio , $social ) {
+
+
+    echo sprintf(
+            '<h3>%s</h3>%s<div class="speaker-bio">%s</div>',
+        get_the_title( $id ),
+        get_the_post_thumbnail( $id , array(100,100)),
+        $bio ? get_post_field('post_content', $id ) : ''
+
+    );
+
+    if( $social ) {
+
+	    get_social_links_from_post_id( $id );
+    }
+
+
+}
+
+function get_social_links_from_post_id( $post_id ) {
+
+	$social_links = carbon_get_post_meta( $post_id, 'ccm_social_links' );
+
+	if ( isset( $social_links ) ) {
+	    echo '<ul class="social-links">';
+		foreach ( $social_links as $link ) {
+
+			echo sprintf( '<li><a href="%s"><i class="fi flaticon-%s"></i> </a></li>'
+				, $link['ccm_social_network_lik'],
+				$link['ccm_social_network_type']
+			);
+		}
+		echo '</ul>';
 	}
 
 }
