@@ -1,59 +1,69 @@
 .speakers-wrap {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  margin-right: -15px;
-  margin-left: -15px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
 }
+
 .speakers-wrap .speaker-profile {
-  -ms-flex-preferred-size: 0;
-  flex-basis: 0;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-  max-width: 100%;
-  position: relative;
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    max-width: 100%;
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
 }
+
 .speakers-wrap .speaker-profile h3 {
-  text-align: center;
+    text-align: center;
 }
+
 .speakers-wrap .speaker-profile img {
-  display: block;
-  margin: 10px auto;
-  border-radius: 50%;
+    display: block;
+    margin: 10px auto;
+    border-radius: 50%;
 }
-.speakers-wrap .speaker-profile .social-links {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+
+.speakers-wrap .speaker-profile a {
+    text-decoration: none;
 }
-.speakers-wrap .speaker-profile .social-links li {
-  -ms-flex-preferred-size: 0;
-  flex-basis: 0;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-  max-width: 100%;
-  position: relative;
-  width: 100%;
-  text-align: center;
-}
+
 .speakers-wrap .speaker-profile .speaker-bio {
-  border: none;
-  padding: 0;
+    border: none;
+    padding: 0;
 }
+
+.speakers-wrap .speaker-profile .social-links-wrap {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: stretch;
+}
+
+.speakers-wrap .speaker-profile .social-links-wrap .social-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.speakers-wrap .speaker-profile .social-links-wrap .social-links li {
+    float: left;
+    margin: 10px;
+}
+
 @media (min-width: 576px) {
-  .speakers-wrap .speaker-profile {
-    -ms-flex: 0 0 33.333333%;
-    flex: 0 0 33.333333%;
-    max-width: 33.333333%;
-  }
+    .speakers-wrap .speaker-profile {
+        -ms-flex: 0 0 33.333333%;
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
 }
 
 /*# sourceMappingURL=shot-codes.css.map */

@@ -365,29 +365,26 @@
     border-radius: 50%;
   }
 
+  a{
+    text-decoration: none;
+  }
+
   .social-links-wrap {
-    max-width: 600px;
-    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: stretch;
   }
 
   .social-links {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
     list-style: none;
-
-    li {
-      -ms-flex-preferred-size: 0;
-      flex-basis: 0;
-      -ms-flex-positive: 1;
-      flex-grow: 1;
-      max-width: 100%;
-      position: relative;
-      width: 100%;
-      text-align: center;
+    padding: 0;
+    margin: 0;
+    li{
+      float: left;
+      margin: 10px;
     }
   }
 

@@ -193,7 +193,8 @@ function get_the_speaker_profile_by_id ( $id , $bio , $social ) {
 
 
     echo sprintf(
-            '<h3>%s</h3>%s<div class="speaker-bio">%s</div>',
+            '<a href="%s"><h3>%s</h3></a>%s<div class="speaker-bio">%s</div>',
+        get_the_permalink( $id ),
         get_the_title( $id ),
         get_the_post_thumbnail( $id , array(100,100)),
         $bio ? get_post_field('post_content', $id ) : ''
@@ -202,7 +203,9 @@ function get_the_speaker_profile_by_id ( $id , $bio , $social ) {
 
     if( $social ) {
 
+        echo '<div class="social-links-wrap">';
 	    get_social_links_from_post_id( $id );
+	    echo '</div>';
     }
 
 
@@ -217,7 +220,7 @@ function get_social_links_from_post_id( $post_id ) {
 		foreach ( $social_links as $link ) {
 
 			echo sprintf( '<li><a href="%s"><i class="fi flaticon-%s"></i> </a></li>'
-				, $link['ccm_social_network_lik'],
+				, $link['ccm_social_network_link'],
 				$link['ccm_social_network_type']
 			);
 		}
